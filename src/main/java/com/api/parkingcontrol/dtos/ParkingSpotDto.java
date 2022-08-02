@@ -3,7 +3,7 @@ package com.api.parkingcontrol.dtos;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class ParkingStopDto {
+public class ParkingSpotDto {
 // validação dos campos obrigatórios e tamanho de carater preenchido
     @NotBlank
     private String parkingSpotNumber;
