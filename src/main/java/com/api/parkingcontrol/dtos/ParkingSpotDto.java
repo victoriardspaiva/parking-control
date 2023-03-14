@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 public class ParkingSpotDto {
 
     @NotBlank
+    // bad request se o campo com essa anotação estiver vazia
     private String parkingSpotNumber;
     @NotBlank
     @Size(max = 7)
