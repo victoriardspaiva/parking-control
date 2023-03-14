@@ -1,6 +1,6 @@
 package com.api.parkingcontrol.services;
 
-confimport com.api.parkingcontrol.models.ParkingSpotModel;
+import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
