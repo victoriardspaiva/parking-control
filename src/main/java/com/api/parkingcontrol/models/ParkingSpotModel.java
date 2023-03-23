@@ -28,7 +28,7 @@ public class ParkingSpotModel implements Serializable {
     private String modelCar;
     @Column(nullable = false, length = 70)
     private String colorCar;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime registrationDate;
     @Column(nullable = false, length = 130)
     private String responsibleName;
@@ -36,4 +36,8 @@ public class ParkingSpotModel implements Serializable {
     private String apartment;
     @Column(nullable = false, length = 30)
     private String block;
+    @Column(nullable = false, length = 11)
+    private String responsibleCpf;
+    @Column(nullable = false, length = 30)
+    private String responsibleEmail;
 }

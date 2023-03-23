@@ -3,6 +3,7 @@ package com.api.parkingcontrol.services;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.repositories.ParkingSpotRepository;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,18 +13,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Transactional
 @Service
+@RequiredArgsConstructor
 public class ParkingSpotService {
 
     final ParkingSpotRepository parkingSpotRepository;
-// comunicação com o repository (Autowired: sugestão do construtores)
-// ponto de injeção para ParkingSpotRepository
-    public ParkingSpotService(ParkingSpotRepository parkingSpotRepository) {
-        this.parkingSpotRepository = parkingSpotRepository;
-    }
 
-// Quando há um salvamento/deleção em cascata é importante usar a annotation @transactionnal para garentir que o SF realize roolback em caso de erro no processamento
-    @Transactional
     public ParkingSpotModel save(ParkingSpotModel parkingSpotModel) {
         return parkingSpotRepository.save(parkingSpotModel);
     }
@@ -48,7 +44,6 @@ public class ParkingSpotService {
         return parkingSpotRepository.findById(id);
     }
 
-    @Transactional
     public void delete(ParkingSpotModel parkingSpotModel) {
         parkingSpotRepository.delete(parkingSpotModel);
     }

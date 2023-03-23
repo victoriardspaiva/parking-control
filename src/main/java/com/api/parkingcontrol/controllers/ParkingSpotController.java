@@ -1,9 +1,12 @@
 package com.api.parkingcontrol.controllers;
 
+import com.api.parkingcontrol.configs.ModelMapperConfig;
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
+import com.api.parkingcontrol.dtos.ResponsibleDto;
 import com.api.parkingcontrol.models.ParkingSpotModel;
 import com.api.parkingcontrol.services.ParkingSpotService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.api.parkingcontrol.mapper.ParkingSpotMapper;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -21,17 +25,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/parking-spot")
 public class ParkingSpotController {
-    @Autowired
-    private ModelMapper modelMapper;
+
+    private final ParkingSpotMapper mapper;
     final ParkingSpotService parkingSpotService;
-// ponto de injeção para parkingspotService
-    public ParkingSpotController(ParkingSpotService parkingSpotService) {
-        this.parkingSpotService = parkingSpotService;
-    }
 
     @PostMapping
     public ResponseEntity<Object> saveParkingSpot(@RequestBody @Valid ParkingSpotDto parkingSpotDto){
@@ -42,26 +43,36 @@ public class ParkingSpotController {
         if(parkingSpotService.existsByApartmentAndBlock(parkingSpotDto.getApartment(), parkingSpotDto.getBlock()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Conflict: Parking Sport already registered for this apartment/block!");
 
-        // @valid vai validar os dados os dados
-        var parkingSpotModel = new ParkingSpotModel();
-        BeanUtils.copyProperties(parkingSpotDto, parkingSpotModel);
-        //conversão de parkingSpotDto para parkingSpotModel
-        parkingSpotModel.setRegistrationDate(LocalDateTime.now(ZoneId.of("UTC")));
-        return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotService.save(parkingSpotModel));
+        ParkingSpotModel parkingSpotModel = mapper.toParkingSpotRequest(parkingSpotDto);
+        ParkingSpotModel savedParkingSpot = parkingSpotService.save(parkingSpotModel);
+        ParkingSpotDto parkingSpotDtoResponse = mapper.toParkingSpotResponse(savedParkingSpot);
+        return ResponseEntity.status(HttpStatus.CREATED).body(parkingSpotDtoResponse);
     }
 
     @GetMapping
-    public ResponseEntity<Page<ParkingSpotModel>> getAllParkingSpots(@PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC)Pageable pageable){
-        // Pageable recurso de paginação
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotService.findAll(pageable));
+    public ResponseEntity<Page<ParkingSpotDto>> getAllParkingSpots(@PageableDefault(                                                               page = 0,
+            size = 10,sort = "id", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<ParkingSpotModel> parkingSpotsModel = parkingSpotService.findAll(pageable);
+        Page<ParkingSpotDto> parkingSpotDto = mapper.toParkingSpotList(parkingSpotsModel);
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotDto);
+    }
+
+    @GetMapping("/responsible")
+    public ResponseEntity<Page<ResponsibleDto>> getAllResponsible(@PageableDefault(
+            page = 0,size = 10,sort = "id",direction = Sort.Direction.ASC)Pageable pageable){
+        Page<ParkingSpotModel> parkingSpotsModel = parkingSpotService.findAll(pageable);
+        Page<ResponsibleDto> responsibleDto = mapper.toResponsibleList(parkingSpotsModel);
+        return ResponseEntity.status(HttpStatus.OK).body(responsibleDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getOneParkingSpot(@PathVariable(value = "id")UUID id) {
+    public ResponseEntity<ParkingSpotDto> getOneParkingSpot(@PathVariable(value = "id")UUID id) {
         Optional<ParkingSpotModel> parkingSpotModelOptional = parkingSpotService.findById(id);
         if (!parkingSpotModelOptional.isPresent())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Parking Spot not found.");
-        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotModelOptional.get());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+
+        ParkingSpotDto parkingSpotResponse = mapper.toParkingSpotResponse(parkingSpotModelOptional.get());
+        return ResponseEntity.status(HttpStatus.OK).body(parkingSpotResponse);
     }
 
     @DeleteMapping("/{id}")
