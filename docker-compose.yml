@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+
+  db:
+    container_name: mariadb
+    image: mariadb
+    restart: always
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: vick1993
+      POSTGRES_DB: parking_control_db
+    ports:
+      - "5432:5432"
+    networks:
+      - postgres-compose-network

@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.stream.DoubleStream;
 
 @Getter
 @Setter
@@ -28,7 +29,7 @@ public class ParkingSpotModel implements Serializable {
     private String modelCar;
     @Column(nullable = false, length = 70)
     private String colorCar;
-    @Column(nullable = true)
+    @Column(nullable = false)
     private LocalDateTime registrationDate;
     @Column(nullable = false, length = 130)
     private String responsibleName;
@@ -40,4 +41,5 @@ public class ParkingSpotModel implements Serializable {
     private String responsibleCpf;
     @Column(nullable = false, length = 30)
     private String responsibleEmail;
+
 }

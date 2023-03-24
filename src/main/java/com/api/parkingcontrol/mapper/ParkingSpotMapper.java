@@ -1,5 +1,6 @@
 package com.api.parkingcontrol.mapper;
 
+import com.api.parkingcontrol.dtos.ParkingDto;
 import com.api.parkingcontrol.dtos.ParkingSpotDto;
 import com.api.parkingcontrol.dtos.ResponsibleDto;
 import com.api.parkingcontrol.models.ParkingSpotModel;
@@ -16,29 +17,22 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 public class ParkingSpotMapper {
-    private final ModelMapper mapper;
+    private final ModelMapper mapperParking;
 
     public ParkingSpotModel toParkingSpotRequest(ParkingSpotDto parkingSpotRequest){
-        return mapper.map(parkingSpotRequest, ParkingSpotModel.class);
+        return mapperParking.map(parkingSpotRequest, ParkingSpotModel.class);
     }
     public ParkingSpotDto toParkingSpotResponse(ParkingSpotModel parkingSpotModel){
-        return mapper.map(parkingSpotModel, ParkingSpotDto.class);
+        return mapperParking.map(parkingSpotModel, ParkingSpotDto.class);
     }
-    public Page<ParkingSpotDto> toParkingSpotList(Page<ParkingSpotModel> parkingSpotList){
-        return new PageImpl(parkingSpotList.stream()
-                .map(this::toParkingSpotResponse)
+    public ParkingDto toParkingResponse(ParkingSpotModel parkingSpotModel){
+        return mapperParking.map(parkingSpotModel, ParkingDto.class);
+
+    }
+    public Page<ParkingDto> toParkingList(Page<ParkingSpotModel> parkingList){
+        return new PageImpl(parkingList.stream()
+                .map(this::toParkingResponse)
                 .collect(Collectors.toList()));
     }
 
-    public ParkingSpotModel toResponsibleRequest(ResponsibleDto responsibleRequest){
-        return mapper.map(responsibleRequest, ParkingSpotModel.class);
-    }
-    public ResponsibleDto toResponsibleResponse(ParkingSpotModel parkingSpotModel) {
-        return mapper.map(parkingSpotModel, ResponsibleDto.class);
-    }
-    public Page<ResponsibleDto> toResponsibleList(Page<ParkingSpotModel> resposibleList) {
-        return new PageImpl(resposibleList.stream()
-                .map(this::toResponsibleResponse)
-                .collect(Collectors.toList()));
-    }
 }
